@@ -64,7 +64,8 @@ System.out.println(liste);%>
                     {
             %>
             <tr>
-                <td><input type="radio" name="listeChambres" value="<%= i %>"/></td>
+                <td><input type="radio" name="ChambreReservee" value="<%= i %>"/></td>
+                <input type="hidden" name="<%= i %>" value="<%= liste.get(i).get_numeroChambre() %>"/>
                 <td> <%= liste.get(i).get_typeChambre() %> </td>
                 <td> <%= liste.get(i).get_categorie() %> </td>
                 <td> <%= liste.get(i).get_numeroChambre() %> </td>

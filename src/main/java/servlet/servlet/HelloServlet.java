@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -105,14 +106,21 @@ public class HelloServlet extends HttpServlet {
                 reservationChambre.set_date(request.getParameter("dateArrivee"));
                 reservationChambre.set_persRef(request.getParameter("persRef"));
                 oos.writeObject(reservationChambre);
-
+                int compteur = 0;
                 while (true) {
                     Chambre chambre = (Chambre) ois.readObject();
                     if (chambre == null)
                         break;
                     else {
                         listChambres.add(chambre);
+                        compteur++;
                     }
+                }
+                if(compteur == 0) {
+                    oos.writeObject("Aucune");
+                }
+                else {
+                    oos.writeObject("OK");
                 }
                 System.out.println(listChambres);
                 session.setAttribute("chambres", listChambres);
@@ -120,7 +128,28 @@ public class HelloServlet extends HttpServlet {
                 break;
 
             case "valider":
-
+                //System.out.println(Integer.parseInt(request.getParameter(request.getParameter("ChambreReservee"))));
+                if(request.getParameter("ChambreReservee") != null) {
+                    int id = Integer.parseInt(request.getParameter(request.getParameter("ChambreReservee")));
+                    Chambre chambreAResa = new Chambre();
+                    for (int i=0; i<listChambres.size();i++) {
+                        if(listChambres.get(i).get_numeroChambre() == id) {
+                            chambreAResa.set_numeroChambre(listChambres.get(i).get_numeroChambre());
+                            chambreAResa.set_prixHTVA(listChambres.get(i).get_prixHTVA());
+                            listChambres.remove(i);
+                            break;
+                        }
+                    }
+                    oos.writeObject(chambreAResa);
+                    String confirmation = (String) ois.readObject();
+                    if (confirmation.equals("OK")) {
+                        JOptionPane.showMessageDialog(null, "Réservation acceptée", "Alert", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Erreur Réservation", "Alert", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+                session.setAttribute("chambres", listChambres);
+                response.sendRedirect("JSPInit.jsp");
                 break;
 
             case "Log out" :
