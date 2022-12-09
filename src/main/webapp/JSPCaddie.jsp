@@ -6,7 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@page import="java.util.ArrayList"%>
+<%@ page import="java.util.ArrayList"%>
 <%@ page import="Classe.Chambre" %>
 <% ArrayList<Chambre> liste = (ArrayList<Chambre>) request.getSession(true).getAttribute("listeChambreReservee");
     System.out.println(liste);%>
@@ -21,8 +21,6 @@
         <thead>
         <tr>
             <th>///</th>
-            <th>TypeChambre</th>
-            <th>catégorie</th>
             <th>Numéro Chambre</th>
             <th>Prix</th>
         </tr>
@@ -35,8 +33,7 @@
         %>
         <tr>
             <td><input type="radio" name="ChambrePayee" value="<%= i %>"/></td>
-            <td> <%= liste.get(i).get_typeChambre() %> </td>
-            <td> <%= liste.get(i).get_categorie() %> </td>
+            <input type="hidden" name="<%= i %>" value="<%= liste.get(i).get_numeroChambre() %>"/>
             <td> <%= liste.get(i).get_numeroChambre() %> </td>
             <td> <%= liste.get(i).get_prixHTVA() %> </td>
         </tr>
@@ -46,6 +43,7 @@
         %>
         </tbody>
     </table>
+
 
     <h4>
         <INPUT type="submit" name="action" value="Payer" size=10>

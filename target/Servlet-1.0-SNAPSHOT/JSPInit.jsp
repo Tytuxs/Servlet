@@ -22,12 +22,9 @@ System.out.println(liste);%>
     <form method="POST" action="hello-servlet">
         <div style=" background-color: gray; justify-content: space-around">
             <h1 align="right">
-                <input type="submit" name="action" value="Go to cart"/>
+                <input type="submit" name="action" value="Caddie"/>
                 <input type="submit" name="action" value="Log out"/>
-                <input type="button" disabled="true" style="background-color: gray; border: gray"/>
             </h1>
-            <h1>‎</h1>
-
         </div>
         <br>
         <h4>
@@ -67,7 +64,8 @@ System.out.println(liste);%>
                     {
             %>
             <tr>
-                <td><input type="radio" name="listeChambres" value="<%= i %>"/></td>
+                <td><input type="radio" name="ChambreReservee" value="<%= i %>"/></td>
+                <input type="hidden" name="<%= i %>" value="<%= liste.get(i).get_numeroChambre() %>"/>
                 <td> <%= liste.get(i).get_typeChambre() %> </td>
                 <td> <%= liste.get(i).get_categorie() %> </td>
                 <td> <%= liste.get(i).get_numeroChambre() %> </td>

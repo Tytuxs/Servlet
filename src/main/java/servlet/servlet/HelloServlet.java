@@ -136,6 +136,7 @@ public class HelloServlet extends HttpServlet {
                         if(listChambres.get(i).get_numeroChambre() == id) {
                             chambreAResa.set_numeroChambre(listChambres.get(i).get_numeroChambre());
                             chambreAResa.set_prixHTVA(listChambres.get(i).get_prixHTVA());
+                            listChambresReservee.add(chambreAResa);
                             listChambres.remove(i);
                             break;
                         }
@@ -149,6 +150,7 @@ public class HelloServlet extends HttpServlet {
                     }
                 }
                 session.setAttribute("chambres", listChambres);
+                session.setAttribute("listeChambreReservee",listChambresReservee);
                 response.sendRedirect("JSPInit.jsp");
                 break;
 
@@ -161,6 +163,9 @@ public class HelloServlet extends HttpServlet {
 
             case "Caddie" :
                 response.sendRedirect("JSPCaddie.jsp");
+                break;
+            case "Payer" :
+                break;
         }
     }
 
