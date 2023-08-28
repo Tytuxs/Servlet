@@ -28,6 +28,9 @@ public class HelloServlet extends HttpServlet {
     ObjectInputStream ois;
     ArrayList<Chambre> listChambres;
     ArrayList<Chambre> listChambresReservee;
+    ArrayList<ReserActCha> listResa;
+    String aPayer;
+
 
     public void init() {
         try {
@@ -39,6 +42,7 @@ public class HelloServlet extends HttpServlet {
             ois = new ObjectInputStream(s.getInputStream());
             listChambres = new ArrayList<>();
             listChambresReservee = new ArrayList<>();
+            listResa = new ArrayList<>();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,6 +102,7 @@ public class HelloServlet extends HttpServlet {
 
             case "recherche" :
                 System.out.println("lancer recherche");
+                listChambres.removeAll(listChambres);
                 oos.writeObject("BROOM");
                 ReserActCha reservationChambre = new ReserActCha();
                 reservationChambre.set_categorie(request.getParameter("categorie"));
@@ -143,14 +148,20 @@ public class HelloServlet extends HttpServlet {
                     }
                     oos.writeObject(chambreAResa);
                     String confirmation = (String) ois.readObject();
-                    if (confirmation.equals("OK")) {
-                        JOptionPane.showMessageDialog(null, "Réservation acceptée", "Alert", JOptionPane.WARNING_MESSAGE);
-                    } else {
+                    if (confirmation.equals("NOK")) {
                         JOptionPane.showMessageDialog(null, "Erreur Réservation", "Alert", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        ReserActCha reservation = (ReserActCha) ois.readObject();
+                        listResa.add(reservation);
+                        System.out.println(reservation.get_id());
+                        System.out.println(reservation.get_numChambre());
+                        System.out.println(reservation.get_prixCha());
+                        JOptionPane.showMessageDialog(null, "Réservation acceptée", "Alert", JOptionPane.WARNING_MESSAGE);
                     }
                 }
                 session.setAttribute("chambres", listChambres);
                 session.setAttribute("listeChambreReservee",listChambresReservee);
+                session.setAttribute("listeResa",listResa);
                 response.sendRedirect("JSPInit.jsp");
                 break;
 
@@ -165,6 +176,70 @@ public class HelloServlet extends HttpServlet {
                 response.sendRedirect("JSPCaddie.jsp");
                 break;
             case "Payer" :
+                int numChambre = Integer.parseInt(request.getParameter(request.getParameter("ChambrePayee")));
+
+                for(int i=0;i<listChambresReservee.size();i++) {
+                    if(listChambresReservee.get(i).get_numeroChambre()==numChambre) {//on cherche numchambre pour tel date => une seule possible
+                        for (int j = 0; j < listResa.size(); j++) { //on prend la reservation correspondante pour avoir l'id de la reservation
+                            if (listChambresReservee.get(i).get_numeroChambre() == listResa.get(j).get_numChambre() && listChambresReservee.get(i).get_prixHTVA() == listResa.get(j).get_prixCha()) {
+                                aPayer = String.valueOf(listResa.get(j).get_id());
+                            }
+                        }
+                    }
+                }
+                System.out.println(aPayer);
+                response.sendRedirect("JSPPay.jsp");
+                break;
+            case "Vider la liste" :
+
+                listChambres.removeAll(listChambres);
+                listChambresReservee.removeAll(listChambresReservee);
+
+                for (int i=0;i<listResa.size();i++) {
+                    oos.writeObject("CROOM");
+                    oos.writeObject(String.valueOf(listResa.get(i).get_id()));
+                    String confirmation = (String) ois.readObject();
+                    System.out.println(confirmation);
+                    //peut creer des erreurs si la suppression de la reservation n'est pas faite dans la bd
+                    //a faire plus tard si le temps
+                }
+
+                listResa.removeAll(listResa);
+
+                session.setAttribute("chambres", listChambres);
+                session.setAttribute("listeChambreReservee",listChambresReservee);
+                session.setAttribute("listeResa",listResa);
+                response.sendRedirect("JSPCaddie.jsp");
+                break;
+            case "accepter" :
+                oos.writeObject("PROOMWEB");
+                oos.writeObject(aPayer);
+                String confirmation = (String) ois.readObject();
+                if (confirmation.equals("NOK")) {
+                    JOptionPane.showMessageDialog(null, "Erreur Paiement", "Alert", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    for(int i=0;i<listResa.size();i++) {
+                        if (listResa.get(i).get_id()==Integer.parseInt(aPayer)) {//on trouve la reservation a supprimer
+                            for(int j=0;j<listChambresReservee.size();j++) {
+                                if(listChambresReservee.get(j).get_numeroChambre()==listResa.get(i).get_numChambre()) {//on trouve la chambre correspondant la reservation a supprimer
+                                    listChambresReservee.remove(j);
+                                }
+                            }
+                            listResa.remove(i);
+                        }
+                    }
+                    JOptionPane.showMessageDialog(null, "Paiement acceptée", "Alert", JOptionPane.WARNING_MESSAGE);
+                }
+                aPayer="";
+                response.sendRedirect("JSPCaddie.jsp");
+                break;
+            case "annuler" :
+                response.sendRedirect("JSPCaddie.jsp");
+                break;
+            case "retour recherche" :
+                listChambres.removeAll(listChambres);
+                session.setAttribute("chambres", listChambres);
+                response.sendRedirect("JSPInit.jsp");
                 break;
         }
     }

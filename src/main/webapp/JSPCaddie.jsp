@@ -8,8 +8,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="Classe.Chambre" %>
-<% ArrayList<Chambre> liste = (ArrayList<Chambre>) request.getSession(true).getAttribute("listeChambreReservee");
-    System.out.println(liste);%>
+<%@ page import="Classe.ReserActCha" %>
+<%
+    ArrayList<Chambre> liste = (ArrayList<Chambre>) request.getSession(true).getAttribute("listeChambreReservee");
+    System.out.println(liste);
+%>
 <html>
 <head>
     <title>Caddie</title>
@@ -44,11 +47,10 @@
         </tbody>
     </table>
 
-
     <h4>
         <INPUT type="submit" name="action" value="Payer" size=10>
-        <INPUT type="submit" name="action" value="Continuer" size=10>
         <INPUT type="submit" name="action" value="Vider la liste" size=10>
+        <INPUT type="submit" name="action" value="retour recherche" size=10>
     </h4>
 </form>
 </body>
